@@ -8,6 +8,7 @@ import (
 
 func main() {
 	bc, err := chain.NewBlockchain()
+	defer bc.DB.Close()
 
 	count := rand.Intn(10)
 	err = bc.AddBlock("send " + string(count) + " from 123 to 231")
@@ -27,7 +28,7 @@ func main() {
 		fmt.Printf("Hash: %x\n", b.Hash)
 		fmt.Println()
 
-		if len(b.Hash) == 0 {
+		if len(b.PrevBlockHash) == 0 {
 			break
 		}
 	}

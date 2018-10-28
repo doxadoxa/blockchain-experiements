@@ -12,8 +12,8 @@ const blocksBucket string = "blocks"
 const tailPointer string = "l"
 
 type Blockchain struct {
-	tail 	[]byte
-	db		*bolt.DB
+	tail []byte
+	DB   *bolt.DB
 }
 
 type BlockchainIterator struct {
@@ -25,7 +25,7 @@ func (bc *Blockchain) AddBlock(data string) error {
 	var lastHash []byte
 	var err error
 
-	err = bc.db.View(func(tx *bolt.Tx) error {
+	err = bc.DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		lastHash = b.Get([]byte(tailPointer))
 
@@ -34,7 +34,7 @@ func (bc *Blockchain) AddBlock(data string) error {
 
 	newBlock := NewBlock(data, lastHash)
 
-	err = bc.db.Update(func(tx *bolt.Tx) error {
+	err = bc.DB.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		serialized, serializeErr := newBlock.Serialize()
 
@@ -51,7 +51,7 @@ func (bc *Blockchain) AddBlock(data string) error {
 }
 
 func (bc *Blockchain) Iterator() *BlockchainIterator {
-	bci := &BlockchainIterator{bc.tail, bc.db}
+	bci := &BlockchainIterator{bc.tail, bc.DB}
 
 	return bci
 }
@@ -86,7 +86,7 @@ func NewBlockchain() (*Blockchain, error) {
 
 		if bucket == nil {
 			genesis := NewGenesisBlock()
-			bucket, _ := bucket.CreateBucket([]byte(blocksBucket))
+			bucket, _ := tx.CreateBucket([]byte(blocksBucket))
 
 			serialized, _ := genesis.Serialize()
 
