@@ -3,18 +3,33 @@ package main
 import (
 	"blockchain-experiements/chain"
 	"fmt"
+	"math/rand"
 )
 
 func main() {
-	bc := chain.NewBlockchain()
+	bc, err := chain.NewBlockchain()
 
-	bc.AddBlock("send 1 from 123 to 231")
-	bc.AddBlock("send 1 from 231 to 123")
+	count := rand.Intn(10)
+	err = bc.AddBlock("send " + string(count) + " from 123 to 231")
 
-	for _, block := range bc.Blocks {
-		fmt.Printf("Previous hash: %x\n", block.PrevBlockHash)
-		fmt.Printf("Data: %s\n", block.Data)
-		fmt.Printf("Hash: %x\n", block.Hash)
-		fmt.Println()
+	i := bc.Iterator()
+
+	if err != nil {
+		fmt.Printf("Error " + string(err.Error()))
+		return
 	}
+
+	for {
+		b, _:= i.Next()
+
+		fmt.Printf("Previous hash: %x\n", b.PrevBlockHash)
+		fmt.Printf("Data: %s\n", b.Data)
+		fmt.Printf("Hash: %x\n", b.Hash)
+		fmt.Println()
+
+		if len(b.Hash) == 0 {
+			break
+		}
+	}
+
 }
