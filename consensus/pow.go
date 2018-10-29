@@ -32,7 +32,7 @@ func (pow *ProofOfWork) prepareData(nonce uint) []byte {
 	data := bytes.Join(
 		[][]byte{
 			pow.block.PrevBlockHash,
-			pow.block.Data,
+			pow.block.HashTransactions(),
 			[]byte(fmt.Sprintf("%x", pow.block.Timestamp)),
 			[]byte(fmt.Sprintf("%x", targetBits)),
 			[]byte(fmt.Sprintf("%x", nonce)),
@@ -56,8 +56,6 @@ func (pow *ProofOfWork) Run() (uint, []byte) {
 	var hashInt big.Int
 	var hash [32]byte
 	var nonce uint = 0
-
-	fmt.Printf("Maining block with data \"%s\"\n", pow.block.Data)
 
 	for nonce < maxNonce {
 		data := pow.prepareData(nonce)
